@@ -1,0 +1,3 @@
+Known Broken Things:
+Emissive textures don't apply to handheld items (Fixed in 1.19+ dev builds of Continuity)
+Creeper charged auras are default (Not supported by ETF yet)

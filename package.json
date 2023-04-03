@@ -1,0 +1,14 @@
+{
+  "name": "textureadapter",
+  "version": "1.0.0",
+  "description": "Tool to extract and resize textures from the monumenta resource pack.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FlamingoBike",
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.31.2"
+  }
+}
