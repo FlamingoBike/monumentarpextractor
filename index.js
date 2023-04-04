@@ -1,4 +1,5 @@
 const fs = require("fs/promises");
+const syncfs = require("fs");
 const sharp = require("sharp");
 
 const config = {
@@ -12,6 +13,16 @@ const output = {
     ITEM_FOLDER: `${config.OUTPUT_PATH}/item`,
     CHARM_FOLDER: `${config.OUTPUT_PATH}/charm`
 }
+
+// This array keeps track of which images have been resized already. This is useful for dyable armor, because:
+// - if a file that ends in "_overlay" is encountered, that should be colored brown and layered ontop of the file
+//   without the "_overlay" ending, but equal rest of the name, and save it with that name.
+// - if this happens after the other item (without "_overlay") has been already processed, this will overwrite the
+//   previously generated output, which is fine.
+// - if this happens before, then processing the item without "_overlay" would overwrite the correct output with an
+//   incorrect one. To fix this, the array below will help pose the condition of avoiding to convert files with
+//   names present in the array, added to it when "_overlay" is found in the file name.
+const resizedImageNames = [];
 
 /**
  * Extract the extension of a given file.
@@ -33,37 +44,95 @@ function getExtension(fileName) {
  * @param {String} lastDirectoryName the name of the parent directory of the image to resize.
  * @returns {void}
  */
-function resizeImage(fileName, filePath, lastDirectoryName) {
+async function resizeImage(fileName, filePath, lastDirectoryName) {
     // A bunch of files that I currently don't care about.
     // There are a few inconsistencies with naming that increase the amount of these checks.
     let fileNameNoExtension = fileName.replace(".png", "");
 
     if (fileNameNoExtension.endsWith("_e") || fileNameNoExtension.endsWith("_blocking") || fileNameNoExtension.includes("_pulling_")
         || fileNameNoExtension.includes("_loading_") || fileNameNoExtension.endsWith("_loaded") || fileNameNoExtension.endsWith("_arrow")
-        || fileNameNoExtension.endsWith("_armor") || fileNameNoExtension.endsWith("_cooldown") || fileNameNoExtension.endsWith("_overlay")) {
+        || fileNameNoExtension.includes("_armor") || fileNameNoExtension.endsWith("_cooldown")) {
 
+        return;
+    }
+
+    let isOverlay = false;
+    if (fileNameNoExtension.endsWith("_overlay")) {
+        // Check if a non overlay texture exists. If it doesn't, simply return.
+        if (!syncfs.existsSync(`${filePath}/${fileName.replace("_overlay", "")}`) || getExtension(fileName.replace("_overlay", "")) != "png") {
+            return;
+        }
+
+        resizedImageNames.push(fileNameNoExtension.replace("_overlay", ""));
+        isOverlay = true;
+    } else if (resizedImageNames.includes(fileNameNoExtension)) {
         return;
     }
 
     // R3 Casino Potions' files are just called "potion", with the parent folder containing the actual name.
     let finalFileName = (fileNameNoExtension == "potion") ? lastDirectoryName : fileNameNoExtension;
-    finalFileName = finalFileName.replace("_standby", "").replace("_icon", "");
+    finalFileName = finalFileName.replace("_standby", "").replace("_icon", "").replace("_full", "");
 
     // Output Path Manipulation
     let outputPath = isCharm(filePath) ? output.CHARM_FOLDER : output.ITEM_FOLDER;
+    if (isOverlay) {
+        // The output should not be considered to have _overlay in the name.
+        finalFileName = finalFileName.replace("_overlay", "");
+    }
     outputPath += `/${upperCamelCase(finalFileName)}.png`;
 
-    let image = sharp(`${filePath}/${fileName}`);
-    image.metadata()
-        .then((metadata) => {
-            return image
+    if (!isOverlay) {
+        let image = sharp(`${filePath}/${fileName}`);
+        await image.metadata()
+            .then((metadata) => {
+                return image
+                    // width and height will need to both be width in order to catch the first frame of an eventual animated texture
+                    .extract({ left: 0, top: 0, width: metadata.width, height: (metadata.height > metadata.width) ? metadata.width : metadata.height })
+                    .resize(config.OUTPUT_WIDTH, config.OUTPUT_HEIGHT, {kernel: sharp.kernel.nearest})
+                    .toFile(outputPath);
+            })
+            .catch((e) => {
+                console.log("Error on file", fileName, "With path", filePath, "In dir", lastDirectoryName);
+                console.error(e);
+            });
+        return;
+    }
+    
+    // Start with opening the dyeable part.
+    let dyeablePart = sharp(`${filePath}/${fileName.replace("_overlay", "")}`);
+    await dyeablePart.metadata()
+        .then(async (metadata) => {
+            const dyeablePartBuffer = await dyeablePart
                 // width and height will need to both be width in order to catch the first frame of an eventual animated texture
+                .extract({ left: 0, top: 0, width: metadata.width, height: (metadata.height > metadata.width) ? metadata.width : metadata.height })
+                .resize(config.OUTPUT_WIDTH, config.OUTPUT_HEIGHT, { kernel: sharp.kernel.nearest })
+                .toBuffer();
+            // Create brown color square and cut it with "dest-in" blend mode, with the shape of the item.
+            const cutDyeSquareBuffer = await sharp({
+                create: {
+                    width: config.OUTPUT_WIDTH,
+                    height: config.OUTPUT_HEIGHT,
+                    channels: 4,
+                    background: { r: 160, g: 101, b: 64, alpha: 255 }
+                }
+            })
+                .composite([{ input: dyeablePartBuffer, left: 0, top: 0, blend: "dest-in" }])
+                .png()
+                .toBuffer();
+            // Compose the cut brown square ontop of the dyeable part, with "multiply" blend mode.
+            const dyedPartBuffer = await sharp(dyeablePartBuffer)
+                .composite([{ input: cutDyeSquareBuffer, left: 0, top: 0, blend: "multiply" }])
+                .toBuffer();
+            // Compose the dyed dyeable part and the static part together.
+            sharp(`${filePath}/${fileName}`)
                 .extract({left: 0, top: 0, width: metadata.width, height: (metadata.height > metadata.width) ? metadata.width : metadata.height})
                 .resize(config.OUTPUT_WIDTH, config.OUTPUT_HEIGHT, {kernel: sharp.kernel.nearest})
+                .composite([{ input: dyedPartBuffer, left: 0, top: 0 }])
                 .toFile(outputPath);
         })
         .catch((e) => {
-            console.log("Error on file", fileName, "With path", filePath, "In dir", lastDirectoryName);
+            console.log("Error on dyeing file", fileName, "With path", filePath, "In dir", lastDirectoryName);
+            console.error(e);
         });
 }
 
