@@ -123,11 +123,15 @@ async function resizeImage(fileName, filePath, lastDirectoryName) {
             const dyedPartBuffer = await sharp(dyeablePartBuffer)
                 .composite([{ input: cutDyeSquareBuffer, left: 0, top: 0, blend: "multiply" }])
                 .toBuffer();
-            // Compose the dyed dyeable part and the static part together.
-            sharp(`${filePath}/${fileName}`)
+            // Prepare the static part, as it needs to be put on top of the dyeable part.
+            // (not the other way around, this is how minecraft does it)
+            const staticPartBuffer = await sharp(`${filePath}/${fileName}`)
                 .extract({left: 0, top: 0, width: metadata.width, height: (metadata.height > metadata.width) ? metadata.width : metadata.height})
                 .resize(config.OUTPUT_WIDTH, config.OUTPUT_HEIGHT, {kernel: sharp.kernel.nearest})
-                .composite([{ input: dyedPartBuffer, left: 0, top: 0 }])
+                .toBuffer();
+            // Compose the dyed dyeable part and the static part together.
+            await sharp(dyedPartBuffer)
+                .composite([{ input: staticPartBuffer, left: 0, top: 0 }])
                 .toFile(outputPath);
         })
         .catch((e) => {
