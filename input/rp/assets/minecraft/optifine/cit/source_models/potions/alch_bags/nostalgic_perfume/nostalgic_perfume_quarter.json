@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/kings_valley/rare/corridors/nostalgic_perfume/nostalgic_perfume_overlay",
-        "layer1": "optifine/cit/kings_valley/rare/corridors/nostalgic_perfume/nostalgic_perfume_quarter"
-    }
-}

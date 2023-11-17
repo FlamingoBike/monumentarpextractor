@@ -1,6 +1,0 @@
-{
-	"parent": "optifine/cit/source_models/shields/bulwark_shield_blocking",
-	"textures": {
-		"all": "optifine/cit/celsian_isles/artifact/teal/bastion_of_isharist/bastion_of_isharist_blocking"
-	}
-}

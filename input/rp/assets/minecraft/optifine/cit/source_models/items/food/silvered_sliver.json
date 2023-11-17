@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-	"textures": {
-		"particle": "optifine/cit/kings_valley/rare/delves/silvered_sliver/silvered_sliver_particle",
-		"layer0": "optifine/cit/kings_valley/rare/delves/silvered_sliver/silvered_sliver"
-    }
-}

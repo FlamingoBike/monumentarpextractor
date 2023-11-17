@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/monumenta/potions/tincture_of_entropy/potion_overlay",
-        "layer1": "optifine/cit/monumenta/potions/tincture_of_entropy/potion"
-    }
-}

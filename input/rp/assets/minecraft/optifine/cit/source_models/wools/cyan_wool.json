@@ -1,6 +1,0 @@
-{
-	"parent": "optifine/cit/source_models/wools/template_wool",
-	"textures": {
-		"all": "optifine/cit/monumenta/wools/cyan/cyan_wool"
-	}
-}

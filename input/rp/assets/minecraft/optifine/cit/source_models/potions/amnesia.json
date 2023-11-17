@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/kings_valley/uncommon/overworld/potions/amnesia/potion_overlay",
-        "layer1": "optifine/cit/kings_valley/uncommon/overworld/potions/amnesia/potion"
-    }
-}

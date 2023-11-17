@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/kings_valley/misc/arena/potions/liquid_bandage/potion_overlay",
-        "layer1": "optifine/cit/kings_valley/misc/arena/potions/liquid_bandage/potion"
-    }
-}

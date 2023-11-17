@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/monumenta/potions/myriads_martini/potion_overlay",
-        "layer1": "optifine/cit/monumenta/potions/myriads_martini/potion"
-    }
-}

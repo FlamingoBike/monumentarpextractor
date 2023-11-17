@@ -1,6 +1,0 @@
-{
-	"parent": "optifine/cit/source_models/shields/base_shield",
-	"textures": {
-		"all": "optifine/cit/celsian_isles/patron/items/frodian_doors/frodian_doors"
-	}
-}

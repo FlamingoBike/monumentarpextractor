@@ -1,7 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures": {
-		"particle": "#layer0",
-		"layer0": "optifine/cit/monumenta/items/food/cooked_zombie_meat/cooked_zombie_meat"
-	}
-}

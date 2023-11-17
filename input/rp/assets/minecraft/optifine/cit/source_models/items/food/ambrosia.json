@@ -1,7 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures": {
-		"particle": "optifine/cit/monumenta/items/food/ambrosia/ambrosia_particle",
-		"layer0": "optifine/cit/monumenta/items/food/ambrosia/ambrosia"
-	}
-}

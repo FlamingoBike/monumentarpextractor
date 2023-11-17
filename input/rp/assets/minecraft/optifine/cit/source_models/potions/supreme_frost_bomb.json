@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/monumenta/legacy/kings_valley/supreme_frost_bomb/potion_overlay",
-        "layer1": "optifine/cit/monumenta/legacy/kings_valley/supreme_frost_bomb/potion"
-    }
-}

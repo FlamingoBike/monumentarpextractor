@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "optifine/cit/kings_valley/rare/corridors/essence_of_the_spirits/potion_overlay",
-        "layer1": "optifine/cit/kings_valley/rare/corridors/essence_of_the_spirits/potion"
-    }
-}

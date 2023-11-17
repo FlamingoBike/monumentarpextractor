@@ -1,6 +1,0 @@
-{
-	"parent": "optifine/cit/source_models/shields/circle_shield",
-	"textures": {
-		"all": "optifine/cit/celsian_isles/rare/overworld/icicles_bulwark/icicles_bulwark"
-	}
-}
